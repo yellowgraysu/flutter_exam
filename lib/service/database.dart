@@ -66,12 +66,6 @@ class _MySqliteDBService {
   Future deleteCourse(String courseId) async {
     await db.delete('courses', where: "id = '$courseId'");
   }
-
-  Future<List<Student>> selectStudents() async {
-    final result = await db.query('students');
-    print(result);
-    return [];
-  }
 }
 
 const initQueries = [

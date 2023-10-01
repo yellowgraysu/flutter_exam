@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_exam/model/user.dart';
 import 'package:flutter_exam/screen/login.dart';
 import 'package:flutter_exam/screen/student.dart';
 import 'package:flutter_exam/screen/teacher.dart';
@@ -32,13 +33,17 @@ class LoginGuard extends StatelessWidget {
   Widget build(BuildContext context) {
     final path = context.vRouter.path;
 
-    return StreamBuilder<String?>(
+    return StreamBuilder<User?>(
       stream: authService.streamUserId,
       builder: (context, snapshot) {
-        final userId = snapshot.data;
-        if (path == LoginScreen.path && userId != null) {
+        final user = snapshot.data;
+        if (path == LoginScreen.path && user != null) {
+          if(user is Teacher){
+context.vRouter.to()
+          }else if(user is Student){
+
+          }
           
-          context.vRouter.to()
         }
 
         return child;
