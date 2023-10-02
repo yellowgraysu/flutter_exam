@@ -16,6 +16,8 @@ void main() {
     const time = '星期三 19:00-21:00';
     const teacherId = 'teacher001';
 
+    await dbService.init();
+
     /// 測試 1: 隨機 course id 不會存在資料庫中
     final test1Courses = await dbService.selectCourses();
     test1Courses.where((element) => false);
