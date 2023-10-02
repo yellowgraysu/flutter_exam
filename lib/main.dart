@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_exam/route.dart';
 import 'package:flutter_exam/service/database.dart';
+import 'package:vrouter/vrouter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,10 +14,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Container(),
-      ),
+    return VRouter(
+      routes: [MyRouteBuilder()],
     );
   }
 }

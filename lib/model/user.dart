@@ -13,6 +13,11 @@ class Student extends User {
     required super.id,
     required super.name,
   });
+
+  factory Student.fromMap(Map<String, Object?> map) => Student(
+        id: map['id'].toString(),
+        name: map['name'].toString(),
+      );
 }
 
 class Teacher extends User {
@@ -22,6 +27,13 @@ class Teacher extends User {
     required super.id,
     required super.name,
   });
+
+  factory Teacher.fromMap(Map<String, Object?> map) => Teacher(
+        id: map['id'].toString(),
+        name: map['name'].toString(),
+        title: map['title'].toString(),
+        photoUrl: map['photo_url']?.toString(),
+      );
 
   final String title;
   final String? photoUrl;

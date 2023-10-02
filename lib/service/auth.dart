@@ -6,13 +6,15 @@ import 'package:flutter_exam/model/user.dart';
 final authService = _AuthService();
 
 class _AuthService {
+  User? user;
+
   _AuthService() : _userController = StreamController<User?>() {
-    _userController.stream.listen((event) {});
+    streamUserId.listen((event) => user = event);
   }
 
   final StreamController<User?> _userController;
-
-  Stream<User?> get streamUserId => _userController.stream.asBroadcastStream();
+  late final Stream<User?> streamUserId =
+      _userController.stream.asBroadcastStream();
 
   // 登陸，回傳為錯誤訊息，如果是null代表成功
   Future<String?> signIn(String id, String password) async {
@@ -30,15 +32,11 @@ class _AuthService {
     }
 
     if (result.first['role'] == 'teacher') {
-      final teacher = await dbService.db.query(
-        'teachers',
-        columns: ['id', 'password', 'role'],
-        where: "id = '$id'",
-      );
-
-      _userController.add(id);
+      final teacher = await dbService.selectTeacherById(id);
+      _userController.add(teacher);
     } else if (result.first['role'] == 'student') {
-      _userController.add(id);
+      final student = await dbService.selectStudentById(id);
+      _userController.add(student);
     }
 
     return null;

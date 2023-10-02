@@ -37,13 +37,15 @@ class LoginGuard extends StatelessWidget {
       stream: authService.streamUserId,
       builder: (context, snapshot) {
         final user = snapshot.data;
-        if (path == LoginScreen.path && user != null) {
-          if(user is Teacher){
-context.vRouter.to()
-          }else if(user is Student){
 
+        if (path == LoginScreen.path && user != null) {
+          if (user is Teacher) {
+            context.vRouter.to(TeacherScreen.path);
+          } else if (user is Student) {
+            context.vRouter.to(StudentScreen.path);
           }
-          
+        } else if (path != LoginScreen.path && user == null) {
+          context.vRouter.to(LoginScreen.path);
         }
 
         return child;

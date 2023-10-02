@@ -1,3 +1,4 @@
+import 'package:flutter_exam/model/course.dart';
 import 'package:flutter_exam/model/user.dart';
 import 'package:sqflite_common/sqflite.dart';
 import 'package:path/path.dart' as p;
@@ -21,23 +22,36 @@ class _MySqliteDBService {
     for (final query in initQueries) {
       db.execute(query);
     }
-    // db.execute(initQuery);
+  }
+
+  Future<Teacher> selectTeacherById(String id) async {
+    final result = await db.rawQuery("SELECT * FROM teachers WHERE id = '$id'");
+    return Teacher.fromMap(result.first);
+  }
+
+  Future<Student> selectStudentById(String id) async {
+    final result = await db.rawQuery("SELECT * FROM students WHERE id = '$id'");
+    return Student.fromMap(result.first);
   }
 
   // 課程列表 API (Read)
-  Future<List<String>> selectCourses() async {
-    final result = await db.query('course', columns: ['name']);
-    return List<String>.from(result.map((e) => e['name']));
+  Future<List<Course>> selectCourses() async {
+    final result = await db.rawQuery('SELECT * FROM courses');
+    return result.map((e) => Course.fromMap(e)).toList();
   }
 
   // 授課講師列表 API (Read)
   Future<List<Teacher>> selectTeachers() async {
-    final result = await db.query('teachers', columns: ['name']);
-    return List<String>.from(result.map((e) => e['name']));
+    final result = await db.rawQuery('SELECT * FROM teachers');
+    return result.map((e) => Teacher.fromMap(e)).toList();
   }
 
   // 授課講師所開課程列表 API (Read)
-  Future selectTeacherCourse() async {}
+  Future selectTeacherCourses(String teacherId) async {
+    final result = await db
+        .rawQuery("SELECT * FROM courses WHERE teacher_id = '$teacherId'");
+    return result.map((e) => Course.fromMap(e)).toList();
+  }
 
   // 建立新講師 API (Create)
   Future createTeacher({
@@ -47,20 +61,31 @@ class _MySqliteDBService {
     required String title,
     String? photoUrl,
   }) async {
-    await db.insert('accounts', {'id': id, 'password': password});
-    await db.insert('teachers', {
-      'id': id,
-      'name': name,
-      'title': title,
-      'photo_url': photoUrl ?? '',
-    });
+    await db.rawInsert(
+        "INSERT INTO accounts (id, password) VALUES('$id', '$password')");
+    await db.rawInsert(
+        "INSERT INTO accounts (id, name,title,photo_url) VALUES('$id', '$name', '$title', '$photoUrl')");
   }
 
   // 建立新課程 API (Create)
-  Future createCourse() async {}
+  Future createCourse({
+    required String id,
+    required String name,
+    required String time,
+    required String teacherId,
+  }) async {
+    await db.rawInsert(
+        "INSERT INTO courses (id, name, time, teacher_id) VALUES('$id','$name', '$time', '$teacherId')");
+  }
 
   // 更新課程內容 API (Update)
-  Future updateCourse() async {}
+  Future updateCourse({
+    required Course course,
+  }) async {
+    await db.rawUpdate(
+        'UPDATE courses SET name = ?, time = ?, teacher_id = ? WHERE id = ?',
+        [course.name, course.time, course.teacherId, course.id]);
+  }
 
   // 刪除課程 API (Delete)
   Future deleteCourse(String courseId) async {
@@ -69,7 +94,7 @@ class _MySqliteDBService {
 }
 
 const initQueries = [
-  "CREATE TABLE accounts(id TEXT PRIMARY KEY NOT NULL UNIQUE,password TEXT)",
+  "CREATE TABLE accounts(id TEXT PRIMARY KEY,password TEXT, role TEXT)",
   "CREATE TABLE teachers (id TEXT PRIMARY KEY,name TEXT,title TEXT,photo_url TEXT);",
   "CREATE TABLE students (id TEXT PRIMARY KEY,name TEXT);",
   "CREATE TABLE courses (id TEXT PRIMARY KEY,name TEXT,time TEXT,teacher_id TEXT);",
